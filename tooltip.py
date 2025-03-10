@@ -78,3 +78,9 @@ class ToolTip:
         """Disables rendering of all tooltips"""
         for tooltip in ToolTip.instances:
             tooltip.tooltip_window.place_forget()
+
+
+    #used for putting a tooltip on a tooltip (again I don't know why you would do this but it's here)
+    def bind(self,button,func,add=""):
+        self.tooltip_container.bind(button, func,add=add)
+        
