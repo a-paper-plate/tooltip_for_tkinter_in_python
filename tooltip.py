@@ -13,7 +13,6 @@ class ToolTip:
             self.tooltip_container = tk.Frame(root,name="tooltip")
         else:
             self.tooltip_container=tooltip_window
-
         # saves widget for later use
         self.widget = widget
 
@@ -30,20 +29,17 @@ class ToolTip:
         try:
             self.tooltip_container.lift(widget)
         except Exception as e:
-            print(e)
+            print("Exception:"+str(e))
 
 
-    # used for allowing input of a tooltip as the 
-    def __call__(self):
-        return self.tooltip_container
 
     
+
     def is_widget_inside(self,widget, container)->bool:
         """Check if 'widget' is inside 'container' at any level, including if the 'widget' IS the 'container'"""
         # checks if the widget is the container and returns true otherwise it continues
         if widget==container:
             return True
-        
         # Traverse up the widget hierarchy
         parent = widget.master
         while parent:  
@@ -55,10 +51,28 @@ class ToolTip:
         return False 
 
 
-
-
+    # used for allowing input of a tooltip as the widget or as the master of other widgets
+    def __call__(self):
+        return self.tooltip_container
+    def __eq__(self, other):
+        if self.tooltip_container==other:
+            return True
+        return False
+    def __getattr__(self, name):
+        if name == "master":
+            return self.tooltip_container.master  # Explicitly return the actual master
+        return getattr(self.tooltip_container, name)
     #-----------------------------start of internal functions-----------------------------
     def _hide_tooltip(self,event) -> None:
+        print(self.tooltip_container)
+        print(event.widget)
+        print(event.widget.master)
+        print(event.widget.master.master)
+        print(True if (event.widget== self.tooltip_container) else False)
+        
+        print(True if (event.widget.master== self.tooltip_container) else False)
+        
+        print(True if (event.widget.master.master== self.tooltip_container) else False)
         """internal function for hiding the tooltip"""
         if not self.is_widget_inside(event.widget,self.tooltip_container):
             self.hide_tooltip()
@@ -68,8 +82,6 @@ class ToolTip:
         """internal function for rendering the tooltip"""
         relative_x = event.widget.winfo_rootx()-self.root.winfo_rootx()+event.x
         relative_y = event.widget.winfo_rooty()-self.root.winfo_rooty()+event.y
-        print(relative_x)
-        print(relative_y)
         self.show_tooltip(x=int(relative_x), y=int(relative_y))
     #-----------------------------end of internal functions-----------------------------
 
